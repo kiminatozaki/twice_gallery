@@ -1,0 +1,1894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TWICE GALLERY</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: auto;
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+        }
+
+        /* --- Auth Forms --- */
+        .auth-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+        .auth-box {
+            background: #0a0a0a;
+            padding: min(40px, 5vw) min(30px, 4vw);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.15);
+            width: min(340px, 90%);
+            color: #fff;
+            box-shadow: 0 0 30px rgba(255,255,255,0.08);
+        }
+        .auth-box h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            text-shadow: 0 0 12px #fff, 0 0 22px #fff;
+            font-weight: 600;
+            letter-spacing: 1px;
+            font-size: clamp(1.3rem, 3vw, 1.6rem);
+        }
+        .auth-box input, .auth-box select {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0;
+            background: #121212;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .auth-box input:focus {
+            outline: none;
+            border-color: #fff;
+            box-shadow: 0 0 8px rgba(255,255,255,0.2);
+        }
+        .auth-box button {
+            width: 100%;
+            padding: 12px;
+            background: #ffffff;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+        .auth-box button:hover {
+            background: #e0e0e0;
+            transform: translateY(-1px);
+            box-shadow: 0 0 12px rgba(255,255,255,0.15);
+        }
+        .auth-toggle {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+            color: #aaa;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .auth-toggle:hover {
+            color: #fff;
+        }
+        .login-options{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .remember-me{
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+        }
+        .remember-me input{
+            width: 15px;
+            height: 15px;
+        }
+        .forgot-password{
+            color: rgba(255,255,255,0.65);
+            text-decoration: none;
+            font-size: 13px;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .forgot-password:hover{
+            color: white;
+        }
+
+        /* --- Profile Header + Dropdown --- */
+        .profile-header {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .profile-icon-wrapper {
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .profile-icon {
+            width: clamp(36px, 6vw, 42px);
+            height: clamp(36px, 6vw, 42px);
+            border-radius: 50%;
+            background: #1a1a1a;
+            border: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #fff;
+            overflow: hidden;
+            transition: all 0.3s;
+            box-shadow: 0 0 10px rgba(255,255,255,0.1);
+        }
+        .profile-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-icon:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 15px rgba(255,255,255,0.25);
+        }
+        .profile-name {
+            font-size: clamp(13px, 2.5vw, 15px);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            display: none;
+        }
+        @media (min-width: 400px) {
+            .profile-name { display: block; }
+        }
+        .profile-dropdown {
+            position: absolute;
+            top: 55px;
+            right: 0;
+            background: #0a0a0a;
+            border: 1px solid #222;
+            border-radius: 10px;
+            width: 160px;
+            display: none;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+        }
+        .profile-dropdown.show {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from {opacity:0; transform: translateY(5px);}
+            to {opacity:1; transform: translateY(0);}
+        }
+        .profile-dropdown a {
+            display: block;
+            padding: 12px 16px;
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background 0.2s;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .profile-dropdown a:last-child {border: none;}
+        .profile-dropdown a:hover {
+            background: #1a1a1a;
+            padding-left: 20px;
+        }
+
+        /* ✅ TITLE */
+        .title {
+            position: fixed;
+            top: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: clamp(1.6rem, 5vw, 2.6rem);
+            font-weight: 700;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-align: center;
+            z-index: 999;
+            background: transparent;
+            text-shadow: 
+                0 0 10px #ffffff, 
+                0 0 20px #ffffff, 
+                0 0 30px #ffffff, 
+                0 0 40px #ffffff;
+        }
+
+        /* ✅ BACK BUTTON — ALWAYS LEFT */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: clamp(40px, 7vw, 50px);
+            height: clamp(40px, 7vw, 50px);
+            background: rgba(10,10,10,0.7);
+            color: white;
+            border: 2px solid white;
+            border-radius: 50%;
+            font-size: clamp(22px, 4vw, 28px);
+            cursor: pointer;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+        .back-btn:hover {
+            background: white;
+            color: black;
+            transform: scale(1.1);
+        }
+
+        .content-area {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 100px 15px 50px;
+            background-color: #000000;
+            position: relative;
+        }
+
+        /* ✅ 3 BOXES PER ROW — FIXED */
+        .gallery-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(25px, 4vw, 35px);
+            width: 100%;
+            max-width: 750px;
+            position: relative;
+        }
+        @media (max-width: 480px) {
+            .gallery-container { max-width: 320px; }
+        }
+
+        .gallery-item-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            aspect-ratio: 1/1;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background-color: #0a0a0a;
+            transition: all 0.3s;
+        }
+        .gallery-item:hover {
+            border-color: #fff;
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        /* ✅ IMAGE INSIDE — BLURRED FIRST */
+        .gallery-icon {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: blur(5px);
+            transition: all 0.4s ease;
+        }
+        .gallery-item:hover .gallery-icon {
+            filter: blur(0px);
+            transform: scale(1.05);
+        }
+
+        /* ✅ TITLE OUTSIDE BOX — CLEAR */
+        .box-title {
+            color: #fff;
+            font-size: clamp(14px, 3vw, 16px);
+            font-weight: 500;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .gallery-item.empty-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            background: #050505;
+        }
+
+        /* ✅ STORY MODAL — FOR TEXT ONLY */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.95);
+            padding: 60px 15px 20px;
+            overflow-y: auto;
+        }
+        .modal-title {
+            color: #fff;
+            text-align: center;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-shadow: 0 0 8px #fff;
+        }
+
+        .close-btn {
+            position: fixed;
+            top: 15px;
+            left: 20px;
+            width: clamp(40px, 7vw, 50px);
+            height: clamp(40px, 7vw, 50px);
+            background: rgba(10,10,10,0.7);
+            color: white;
+            border: 2px solid white;
+            border-radius: 50%;
+            font-size: clamp(22px, 4vw, 28px);
+            cursor: pointer;
+            z-index: 999999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .close-btn:hover {
+            background: white;
+            color: black;
+            transform: scale(1.1);
+        }
+
+        .story-content {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #111;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            line-height: 1.7;
+            font-size: clamp(15px, 3vw, 17px);
+            min-height: 300px;
+            white-space: pre-wrap;
+            position: relative; /* ✅ For eye icon positioning */
+        }
+
+        /* ✅ VIEW ICON — TOP RIGHT INSIDE STORY BOX */
+        .view-icon {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #ccc;
+            font-size: 14px;
+        }
+        .view-icon i {
+            font-size: 20px;
+        }
+
+        /* ✅ COMMENTS SECTION */
+        .comments-section {
+            max-width: 700px;
+            margin: 20px auto 0;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .comments-section h3 {
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: #ddd;
+        }
+        .comment-input-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .comment-input-area input {
+            flex: 1;
+            padding: 10px 12px;
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 6px;
+        }
+        .comment-input-area button {
+            padding: 10px 16px;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .comment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .comment-item {
+            padding: 10px;
+            background: #1a1a1a;
+            border-radius: 6px;
+            border-left: 3px solid #555;
+        }
+        .comment-author {
+            font-weight: 600;
+            font-size: 13px;
+            color: #aaa;
+            margin-bottom: 4px;
+        }
+        .comment-text {
+            font-size: 14px;
+            color: #eee;
+        }
+
+        /* ✅ ADMIN EDIT PANEL */
+        .admin-edit {
+            max-width: 700px;
+            margin: 15px auto;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        .admin-edit.show { display: flex; }
+        .admin-edit input, .admin-edit textarea {
+            width: 100%;
+            padding: 10px;
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .admin-edit textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        .admin-btn {
+            padding: 8px 12px;
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .admin-btn:hover { background: #ddd; }
+
+        #homeScreen {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            background-color: rgba(0,0,0,0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 100px 15px 20px;
+        }
+        .home-title {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: clamp(1.6rem, 5vw, 2.5rem);
+            font-weight: bold;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 
+                0 0 10px #ffffff, 
+                0 0 20px #ffffff, 
+                0 0 30px #ffffff, 
+                0 0 40px #ffffff;
+            z-index: 10;
+        }
+
+        /* ✅ MENU — 3 BOXES PER ROW, SAME STYLE */
+        .menu-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(25px, 4vw, 35px);
+            width: 100%;
+            max-width: 750px;
+        }
+        @media (max-width: 480px) {
+            .menu-container { max-width: 320px; }
+        }
+
+        .menu-btn-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .menu-btn {
+            position: relative;
+            aspect-ratio: 1 / 1;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #0a0a0a;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 12px rgba(255,255,255,0.08);
+            width: 100%;
+        }
+        .menu-icon {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: blur(5px);
+            transition: all 0.4s ease;
+        }
+        .menu-btn:hover .menu-icon {
+            filter: blur(0px);
+            transform: scale(1.05);
+        }
+        .menu-label {
+            color: #fff;
+            font-size: clamp(14px, 3vw, 16px);
+            font-weight: 500;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .menu-btn:hover {
+            transform: scale(1.04);
+            border-color: white;
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+
+        #mainContent { display: none; }
+
+        /* --- ✅ PROFILE EDITOR --- */
+        .page-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 20000;
+            display: none;
+            padding: 80px 20px 20px;
+            overflow-y: auto;
+            background: radial-gradient(circle at center, #0a0a0a 0%, #000 100%);
+        }
+        .close-page {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 28px;
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .close-page:hover { transform: scale(1.2); }
+
+        .profile-box {
+            max-width: 480px;
+            margin: 30px auto;
+            background: #0a0a0a;
+            padding: min(40px, 5vw) min(30px, 4vw);
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 0 40px rgba(255,255,255,0.05);
+        }
+        .profile-box h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 0 12px #fff, 0 0 20px #fff;
+            font-weight: 600;
+            letter-spacing: 1px;
+            font-size: clamp(1.5rem, 4vw, 1.8rem);
+        }
+        .form-group {
+            margin-bottom: 22px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #ccc;
+            letter-spacing: 0.5px;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 12px 15px;
+            background: #121212;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #fff;
+            box-shadow: 0 0 8px rgba(255,255,255,0.15);
+        }
+        .crop-preview-container {
+            width: 200px;
+            height: 200px;
+            border-radius: 8px;
+            border: 2px solid #fff;
+            margin: 15px auto;
+            overflow: hidden;
+            position: relative;
+            background: #111;
+            display: none;
+            max-width: 80%;
+        }
+        #cropPreview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .save-btn {
+            width: 100%;
+            padding: 13px;
+            background: #ffffff;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        .save-btn:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255,255,255,0.1);
+        }
+
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<!-- ✅ AUTH SYSTEM -->
+<div id="authSection" class="auth-container">
+    <div id="loginBox" class="auth-box">
+        <h2>Login</h2>
+        <input type="text" id="loginUser" placeholder="Username">
+        <input type="password" id="loginPass" placeholder="Password">
+        <div class="login-options">
+            <label class="remember-me">
+                <input type="checkbox" id="saveAccount">
+                <span>Remember Me</span>
+            </label>
+            <span class="forgot-password" onclick="showForgotPass()">
+                Forgot Password?
+            </span>
+        </div>
+        <button onclick="login()">Login</button>
+        <div class="auth-toggle" onclick="showRegister()">Don't have account? Register</div>
+    </div>
+
+    <!-- ✅ NEW FORGOT PASSWORD FORM — ADDED OLD USERNAME -->
+    <div id="forgotPassBox" class="auth-box" style="display:none;">
+        <h2>Reset Account</h2>
+        <input type="text" id="oldUser" placeholder="Old Username">
+        <input type="text" id="newUser" placeholder="New Username">
+        <input type="password" id="newPass" placeholder="New Password">
+        <button onclick="resetAccount()">Restart</button>
+        <div class="auth-toggle" onclick="showLogin()">Back to Login</div>
+    </div>
+
+    <div id="registerBox" class="auth-box" style="display:none;">
+        <h2>Register</h2>
+        <input type="text" id="regUser" placeholder="Username">
+        <input type="password" id="regPass" placeholder="Password">
+        <button onclick="register()">Register</button>
+        <div class="auth-toggle" onclick="showLogin()">Already have account? Login</div>
+    </div>
+</div>
+
+<!-- ✅ PROFILE HEADER + DROPDOWN -->
+<div id="profileHeader" class="profile-header" style="display:none;">
+    <div class="profile-icon-wrapper" onclick="toggleDropdown(event)">
+        <div class="profile-icon" id="profileIconDisplay"><i class="fas fa-user"></i></div>
+        <div class="profile-name" id="profileName"></div>
+        <div class="profile-dropdown" id="profileMenu">
+            <a href="#" onclick="openPage('profilePage')"><i class="fas fa-user-edit"></i> Edit Profile</a>
+            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ PAGES -->
+<div id="profilePage" class="page-container">
+    <span class="close-page" onclick="closePage('profilePage')">&times;</span>
+    <div class="profile-box">
+        <h2>Edit Profile</h2>
+        <div class="form-group">
+            <label>Profile Picture</label>
+            <input type="file" id="profilePicFile" accept="image/*" onchange="previewCrop(this)">
+            <div class="crop-preview-container" id="cropContainer">
+                <img id="cropPreview" src="" alt="Crop Preview">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="editUsername" placeholder="New username">
+        </div>
+        <button class="save-btn" onclick="saveProfile()">Save Changes</button>
+    </div>
+</div>
+
+<div id="homeScreen" style="display:none;">
+    <h1 class="home-title">TWICE GALLERY</h1>
+    <!-- ✅ MENU — 3 PER ROW, IMAGES BLURRED, TITLES OUTSIDE -->
+    <div class="menu-container">
+        <div class="menu-btn-wrapper" onclick="openSet(1)">
+            <div class="menu-btn">
+                <img class="menu-icon" src="icons/saida.jpg" alt="">
+            </div>
+            <div class="menu-label">Saida Smut Collection</div>
+        </div>
+        <div class="menu-btn-wrapper" onclick="openSet(2)">
+            <div class="menu-btn">
+                <img class="menu-icon" src="icons/soon.jpg" alt="">
+            </div>
+            <div class="menu-label">SOON</div>
+        </div>
+        <div class="menu-btn-wrapper" onclick="openSet(3)">
+            <div class="menu-btn">
+                <img class="menu-icon" src="icons/soon.jpg" alt="">
+            </div>
+            <div class="menu-label">SOON</div>
+        </div>
+        <div class="menu-btn-wrapper" onclick="openSet(4)">
+            <div class="menu-btn">
+                <img class="menu-icon" src="icons/soon.jpg" alt="">
+            </div>
+            <div class="menu-label">SOON</div>
+        </div>
+        <div class="menu-btn-wrapper" onclick="openSet(5)">
+            <div class="menu-btn">
+                <img class="menu-icon" src="icons/soon.jpg" alt="">
+            </div>
+            <div class="menu-label">SOON</div>
+        </div>
+        <div class="menu-btn-wrapper" onclick="openSet(6)">
+            <div class="menu-btn">
+                <img class="menu-icon" src="icons/soon.jpg" alt="">
+            </div>
+            <div class="menu-label">SOON</div>
+        </div>
+        <div class="menu-btn-wrapper" onclick="openSet(7)">
+            <div class="menu-btn">
+                <img class="menu-icon" src="icons/soon.jpg" alt="">
+            </div>
+            <div class="menu-label">SOON</div>
+        </div>
+        <div class="menu-btn-wrapper" onclick="openSet(8)">
+            <div class="menu-btn">
+                <img class="menu-icon" src="icons/soon.jpg" alt="">
+            </div>
+            <div class="menu-label">SOON</div>
+        </div>
+        <div class="menu-btn-wrapper" onclick="openSet(9)">
+            <div class="menu-btn">
+                <img class="menu-icon" src="icons/soon.jpg" alt="">
+            </div>
+            <div class="menu-label">SOON</div>
+        </div>
+        <div class="menu-btn-wrapper" onclick="openSet(10)">
+            <div class="menu-btn">
+                <img class="menu-icon" src="icons/soon.jpg" alt="">
+            </div>
+            <div class="menu-label">SOON</div>
+        </div>
+        <div class="menu-btn-wrapper" onclick="openSet(11)">
+            <div class="menu-btn">
+                <img class="menu-icon" src="icons/soon.jpg" alt="">
+            </div>
+            <div class="menu-label">SOON</div>
+        </div>
+    </div>
+</div>
+
+<div id="mainContent">
+
+    <h1 class="title">CLICK FOR BETTER QUALITY</h1>
+
+    <!-- ✅ SET 1 — 3x3, IMAGES BLURRED, TITLES OUTSIDE -->
+    <div id="set1" class="content-area">
+        <button class="back-btn" onclick="backToMenu()">&times;</button>
+        <div class="gallery-container">
+            <div class="gallery-item-wrapper" onclick="openStory(1)">
+                <div class="gallery-item">
+                    <img class="gallery-icon" src="icons/teacher.jpg" alt="">
+                </div>
+                <div class="box-title" id="title_1">Hot Teacher Miss Minatozaki</div>
+            </div>
+            <div class="gallery-item-wrapper" onclick="openStory(2)">
+                <div class="gallery-item">
+                    <img class="gallery-icon" src="icons/story2.jpg" alt="">
+                </div>
+                <div class="box-title" id="title_2">Say my name</div>
+            </div>
+            <div class="gallery-item-wrapper" onclick="openStory(3)">
+                <div class="gallery-item">
+                    <img class="gallery-icon" src="icons/story3.jpg" alt="">
+                </div>
+                <div class="box-title" id="title_3">HER COLD BOSS</div>
+            </div>
+            <div class="gallery-item-wrapper" onclick="openStory(4)">
+                <div class="gallery-item">
+                    <img class="gallery-icon" src="icons/story4.jpg" alt="">
+                </div>
+                <div class="box-title" id="title_4">BREED ME</div>
+            </div>
+            <div class="gallery-item-wrapper" onclick="openStory(5)">
+                <div class="gallery-item">
+                    <img class="gallery-icon" src="icons/story5.jpg" alt="">
+                </div>
+                <div class="box-title" id="title_5">HALLOWEEN NIGHT</div>
+            </div>
+            <div class="gallery-item-wrapper" onclick="openStory(6)">
+                <div class="gallery-item">
+                    <img class="gallery-icon" src="icons/story6.jpg" alt="">
+                </div>
+                <div class="box-title" id="title_6">JEALOUSY</div>
+            </div>
+            <div class="gallery-item-wrapper" onclick="openStory(7)">
+                <div class="gallery-item">
+                    <img class="gallery-icon" src="icons/story7.jpg" alt="">
+                </div>
+                <div class="box-title" id="title_7">Title 7</div>
+            </div>
+            <div class="gallery-item-wrapper" onclick="openStory(8)">
+                <div class="gallery-item">
+                    <img class="gallery-icon" src="icons/story8.jpg" alt="">
+                </div>
+                <div class="box-title" id="title_8">Title 8</div>
+            </div>
+            <div class="gallery-item-wrapper" onclick="openStory(9)">
+                <div class="gallery-item">
+                    <img class="gallery-icon" src="icons/story9.jpg" alt="">
+                </div>
+                <div class="box-title" id="title_9">Title 9</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ SET 2 TO 11 (SAME STYLE) -->
+    <div id="set2" class="content-area" style="display:none;">
+        <button class="back-btn" onclick="backToMenu()">&times;</button>
+        <div class="gallery-container">
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+        </div>
+    </div>
+
+    <div id="set3" class="content-area" style="display:none;">
+        <button class="back-btn" onclick="backToMenu()">&times;</button>
+        <div class="gallery-container">
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+        </div>
+    </div>
+
+    <div id="set4" class="content-area" style="display:none;">
+        <button class="back-btn" onclick="backToMenu()">&times;</button>
+        <div class="gallery-container">
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+        </div>
+    </div>
+
+    <div id="set5" class="content-area" style="display:none;">
+        <button class="back-btn" onclick="backToMenu()">&times;</button>
+        <div class="gallery-container">
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+        </div>
+    </div>
+
+    <div id="set6" class="content-area" style="display:none;">
+        <button class="back-btn" onclick="backToMenu()">&times;</button>
+        <div class="gallery-container">
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+        </div>
+    </div>
+
+    <div id="set7" class="content-area" style="display:none;">
+        <button class="back-btn" onclick="backToMenu()">&times;</button>
+        <div class="gallery-container">
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+        </div>
+    </div>
+
+    <div id="set8" class="content-area" style="display:none;">
+        <button class="back-btn" onclick="backToMenu()">&times;</button>
+        <div class="gallery-container">
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+        </div>
+    </div>
+
+    <div id="set9" class="content-area" style="display:none;">
+        <button class="back-btn" onclick="backToMenu()">&times;</button>
+        <div class="gallery-container">
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+        </div>
+    </div>
+
+    <div id="set10" class="content-area" style="display:none;">
+        <button class="back-btn" onclick="backToMenu()">&times;</button>
+        <div class="gallery-container">
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+        </div>
+    </div>
+
+    <div id="set11" class="content-area" style="display:none;">
+        <button class="back-btn" onclick="backToMenu()">&times;</button>
+        <div class="gallery-container">
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+            <div class="gallery-item empty-box">Soon</div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ✅ STORY MODAL + ADMIN EDIT -->
+<div id="storyModal" class="modal">
+    <span class="close-btn" onclick="closeStory()">&times;</span>
+    <div class="modal-title" id="storyModalTitle"></div>
+
+    <!-- ✅ ADMIN EDIT PANEL (ONLY VISIBLE TO ADMIN) -->
+    <div class="admin-edit" id="adminPanel">
+        <input type="text" id="editTitle" placeholder="Edit Title...">
+        <textarea id="editContent" placeholder="Write your story here..."></textarea>
+        <button class="admin-btn" onclick="saveStory()">Save Changes</button>
+    </div>
+
+    <div class="story-content" id="storyText">
+        <!-- ✅ VIEW ICON — TOP RIGHT INSIDE BOX -->
+        <div class="view-icon">
+            <i class="fas fa-eye"></i>
+            <span id="viewCount">0</span>
+        </div>
+    </div>
+
+    <!-- ✅ COMMENTS SECTION -->
+    <div class="comments-section" id="commentsSection">
+        <h3>Comments</h3>
+        <div class="comment-input-area">
+            <input type="text" id="commentText" placeholder="Write a comment...">
+            <button onclick="addComment()">Post</button>
+        </div>
+        <div class="comment-list" id="commentList"></div>
+    </div>
+</div>
+
+<script>
+let currentUser = null;
+let activeStoryId = null;
+const ADMIN_USERNAME = "admin";
+
+// ✅ STORIES DATABASE — FULL COMPLETED VERSION
+let stories = {
+    1: { 
+        title: "Hot Teacher Miss Minatozaki", 
+        content: `~Third Person Pov~
+
+Miss Minatozaki, but they knew her as Sana, at least that was the name she said she preferred for.
+
+Then there's Kim Dahyun, one of Sana's student this year. Dahyun was met first Miss Minatozaki-- I mean Sana, when she was a senior at Seoul National University and Dahyun was her Japanese teacher back then. And Dahyun knew the moment she stepped into the classroom, she had to have her. Well, Sana had a hot body built for sex.
+
+Minatozaki Sana was about twenty-seven and had supermodel looks. Standing about five foot five with long flowing silky long dark hair, but she sometimes wore wavy hair, she had curves in all the right places. She wore her shirts a bit on the rough side and she had equally tight fitting skirts that hugged her body perfectly. And Dahyun liked the way Sana brushed her hair back over her shoulder and smiled before talking.
+
+"Okay, ladies and gents," Sana called out to Dahyun's classmates. "Take a seat."
+
+As everyone shuffled for a desk, Dahyun leaned up against the chalkboard in the back of the room, watching the chaos in front of her as the students argued over the desks and chairs.
+
+Sana then looked at her, arched her eyebrow and then patted a desk near the front of the room that she sit on.
+
+"This one has your name on it," Sana remarked. Dahyun then slowly walked towards the desk and sat down. Sana then leaned forward, giving the pale girl a great view straight down her shirt. And Dahyun did her best to avert her gaze, but she couldn't.
+
+"You now have the best seat in the room," Sana nonchalantly remarked. Dahyun could smell the sweetness of her expensive prada perfume, yes she name it, which only heightened her desires.
+
+Sana paced back and forth telling them what the class would be about and her rules and expectations. Dahyun eyes then were glued to her ass and she wondered if she wore panties, a thong or perhaps nothing at all under her tight skirt.
+
+Dahyun mind wandered.
+
+The pale girl was brought back to reality when Sana tapped on her desk and asked her if she was paying attention. Which Dahyun was not, and she was caught.
+
+"I'm sorry, Miss Minatozaki," Dahyun answered, "I was day dreaming."
+
+"You need to stay focused," Sana politely warned. "Think about your girlfriend and other things outside of class, not in here." she added.
+
+"Yes ma'am," Dahyun dutifully replied.
+
+Sana went on for another twenty minutes talking about the course curriculum and expectations, and Dahyun did her best to pay attention, but it was hard for her. The bell then rang calling for the class change. As Dahyun was at the front of the class, and it took a few minutes for the classroom to empty out. And she waited before getting up from her desk.
+
+"Hold on a minute," Miss Minatozaki called out as Dahyun got up to leave.
+
+The pale girl was in a hurry to meet up with some of her friends for lunch, but Sana stepped to the back of the room and locked the classroom door, and she turned out the classroom lights. Dahyun watched her as she stepped down a row of desks and walked to where the pale girl was still seated.
+
+Sana sat on a desk next to her, crossing her ankles, her tight skirt inching up, well past her knees and mid-thigh. Sana made no attempt to correct her obvious tease. She brushed her long dark hair back over her shoulder as she looked at Dahyun, and then rubbed her hands together in front of  her chest.
+
+"You know, Dahyun," Sana started, her voice dropping an octave, soft and silky, "I’ve noticed you looking at me. Not just today... but every single class."
+
+Dahyun’s heart hammered against her ribs. Her mouth went dry, and she struggled to find words. "I... I didn't mean to be disrespectful, Miss Minatozaki—"
+
+"Sana," she corrected, leaning closer, her perfume wrapping around Dahyun like a warm, intoxicating cloud. "Call me Sana when we’re alone. And don’t act like you don’t enjoy looking. I see the way your eyes follow me... the way you bite your lip when I bend over to write on the board."
+
+Sana reached out, her slender fingers tracing lightly along the line of Dahyun’s jaw, sending shivers racing down the younger girl’s spine. Dahyun swallowed hard, her breath hitching as those fingers trailed down to her chin, lifting her face so their eyes met.
+
+"I’ve been watching you too, you know," Sana whispered, her gaze dropping to Dahyun’s lips before returning to her eyes, dark and heavy with desire. "Wondering what you’re thinking about... imagining exactly what you want to do to me."
+
+Dahyun’s mind reeled. This couldn’t be happening. This was her teacher, the woman she’d fantasized about countless nights, the woman she thought was completely out of reach. But here she was, alone in a dim classroom, touching her, looking at her like she was something to be devoured.
+
+"And what... what do you think I want?" Dahyun managed to say, her voice barely a whisper, trembling slightly.
+
+Sana smiled, a slow, wicked curve of her lips that made Dahyun’s stomach flip. She shifted closer, one leg swinging over the side of the desk so she was standing between Dahyun’s knees, her body inches away.
+
+"I think," Sana murmured, her hand sliding down to rest lightly on Dahyun’s shoulder, then slowly moving lower, over her chest, "that you want to touch me. You want to know how soft my skin is. You want to know what I sound like when I’m not standing in front of a classroom, acting like a proper teacher."
+
+Dahyun’s hands instinctively came to rest on Sana’s waist, her fingers gripping the fabric of the tight blouse, terrified and desperate all at once. "Sana..."
+
+"Tell me to stop," Sana challenged, leaning in until their noses brushed, her breath warm against Dahyun’s lips. "If you want me to stop, say it right now, and I’ll unlock the door, and we’ll pretend this never happened."
+
+But Dahyun didn’t want her to stop. She’d wanted this for too long. Instead of pulling away, she tightened her grip on Sana’s waist, pulling her closer until their bodies pressed together.
+
+"I don’t want you to stop," Dahyun breathed out, and that was all the permission Sana needed.
+
+Sana crashed her lips onto Dahyun’s, hungry and demanding, no hesitation, no holding back. It was everything Dahyun had dreamed of and more—soft, warm, tasting of sweet vanilla and something uniquely Sana. Dahyun melted into the kiss, her hands sliding up to tangle in Sana’s hair, pulling her even closer, desperate to feel every inch of her.
+
+Sana moaned softly against Dahyun’s mouth, her fingers tangling in the younger girl’s hair, tugging gently. She pressed her body fully against Dahyun’s, letting her feel every curve, every soft swell, every line that she’d spent so much time admiring from a distance.
+
+"You have no idea," Sana whispered between kisses, trailing her lips along Dahyun’s jawline, down to her neck, "how long I’ve waited for this. How hard it’s been to stand in front of you every day, knowing exactly what you were thinking, knowing I wanted it just as much."
+
+Dahyun gasped as Sana’s teeth grazed the sensitive skin of her neck, hands roaming freely now, slipping under the hem of Dahyun’s shirt, fingers dancing over warm skin.
+
+"Then show me," Dahyun said, breathless and bold, her hands sliding down to cup Sana’s perfect ass, pulling her flush against her. "Show me everything you’ve been hiding, Miss Minatozaki."
+
+Sana laughed, low and throaty, the sound vibrating right through Dahyun’s chest. She pulled back just enough to look into Dahyun’s eyes, her pupils blown wide with lust.
+
+"Oh, baby," she purred, grinding her hips slowly against Dahyun’s, making the younger girl’s head spin. "I’m going to show you exactly what kind of teacher I really am."
+
+The bell rang for the next period, loud and shrill through the school corridors, but neither of them moved. The door was locked, the lights were low, and for the first time, the rules didn’t matter.
+
+Sana pushed Dahyun back against the desk, climbing onto her lap, legs wrapping around her waist, skirt riding high up her thighs, revealing exactly what Dahyun had wondered about earlier—nothing at all underneath.
+
+"Class is in session," Sana whispered, capturing Dahyun’s lips again, as the world outside the classroom faded away completely.
+`
+    },
+    2: { 
+        title: "Say my name", 
+        content: `~Sana's Pov~
+
+I was sitting at my desk, trying to focus on grading papers, but my mind kept drifting. It had been three weeks since that afternoon in the classroom. Three weeks since I’d crossed every line I was supposed to follow. Three weeks since I realized I was completely, helplessly addicted to Kim Dahyun.
+
+I heard the soft click of the door closing, and I didn’t even have to look up to know who it was. Only one person walked into my office like she owned the place—confident, a little cocky, and entirely mine.
+
+"Busy?"
+
+Her voice. God, her voice. Soft, playful, knowing exactly what it did to me.
+
+I looked up, pushing my glasses up the bridge of my nose, trying my best to look stern, professional, anything other than the mess I became whenever she was near. Dahyun was leaning against the doorframe, school uniform slightly disheveled, tie loose around her neck, hair messy like she’d been running her hands through it.
+
+"Shouldn't you be in your next class, Miss Kim?" I asked, though there was no bite in my tone.
+
+Dahyun pushed off the door and sauntered toward my desk, hips swaying in that way that made my breath catch. She stopped right in front of me, leaning down, hands flat on the desk, trapping me between her arms.
+
+"Miss Kim," she repeated, mockingly, a smirk playing on her lips. "Is that really what you’re going to call me now? After everything we did?"
+
+I swallowed hard, heat rising up my neck. "I am your teacher, Dahyun. We have to be careful."
+
+"Careful," she scoffed, one hand reaching out to trace the collar of my blouse, fingers slipping just inside, touching the skin of my neck. "You weren't very careful last Tuesday. Or Wednesday. Or Friday morning when you let me into your office before school started."
+
+My face burned. She wasn't wrong. Every time I told myself it was the last time, every time I promised I’d keep my distance, she’d walk in, look at me with those bright, mischievous eyes, and I’d crumble all over again.
+
+Dahyun walked around the side of the desk, her hand never leaving me, sliding down my arm, over my shoulder, resting at the base of my neck. She leaned down, her lips brushing against my ear, sending shivers straight down my spine.
+
+"You like it," she whispered, her thumb rubbing gently over my pulse point, which was beating far too fast. "You love it when I come here. You love it when I touch you. You love it when I make you forget you’re the teacher and I’m the student."
+
+I turned my head, and our faces were inches apart. I could see every fleck of brown in her eyes, every detail of her smile. I could smell her—fresh, clean, young, everything I shouldn't want but couldn't live without.
+
+"Dahyun..." I breathed out, weak, already defeated.
+
+She smiled, knowing she had won. Her hand moved from my neck to my chin, tilting my face up.
+
+"Say it," she commanded softly.
+
+"Say what?" I asked, my voice trembling.
+
+She leaned closer, her lips ghosting over mine, teasing, never quite touching.
+
+"Say my name. Not Miss Kim. Not student. Say it like you mean it. Say it like you say it when I have you pinned against the wall. Say it like you say it when I make you forget your own name."
+
+My heart pounded against my ribs. I could feel the heat radiating off her body, the magnetic pull that drew me in every single time.
+
+"Dahyun," I whispered, barely audible.
+
+"Louder," she demanded, her hand sliding down to rest on my chest, right over my heart. "And look at me when you say it."
+
+I looked straight into her eyes, dark and full of desire, and I let all the pretense fall away. All the rules, all the worries, all the reasons this was wrong—they all vanished.
+
+"Dahyun," I said, clear and loud and desperate.
+
+She grinned, satisfied and hungry. "Good girl."
+
+She pulled me up from the chair, spinning me around so I was sitting on the edge of the desk, papers scattering everywhere, forgotten. She stepped between my legs, hands resting on my thighs, sliding up slowly, pushing my skirt higher and higher.
+
+"That's better," she murmured, stepping closer until there was no space left between us. "Now... say it again. And don't stop saying it."
+
+I didn't argue. I didn't resist. I wrapped my arms around her neck and pulled her down to me, and as her lips crashed onto mine, the only word on my mind, the only word on my lips, was hers.
+`
+    },
+    3: { 
+        title: "HER COLD BOSS", 
+        content: `~Third Person Pov~
+
+Hirai Momo was known for many things. Her sharp mind, her ruthless business tactics, her incredible success at such a young age. But mostly, she was known for being cold. Distant. Unreachable.
+
+As her personal secretary, Minatozaki Sana knew this better than anyone. She had worked for Momo for two years, standing by her side through every meeting, every negotiation, every late night at the office. In all that time, Sana had never seen Momo smile genuinely. She had never heard her laugh. She had never seen her show any emotion other than focus, annoyance, or indifference.
+
+To everyone else, Momo was a robot. A perfect, beautiful, terrifying machine built to make money and run her empire.
+
+But Sana knew better. Or at least... she suspected better.
+
+She knew the way Momo’s eyes would linger on her a second too long when she handed her documents. She knew the way Momo’s voice would drop slightly, become softer, when it was just the two of them in the office late at night. She knew the way Momo’s fingers would brush against hers, accidental or not, and how Momo would freeze for a moment before pulling away quickly.
+
+Sana had fallen for her boss a long time ago. It was dangerous, stupid, and completely hopeless. Momo Hirai didn't do feelings. Momo Hirai didn't do relationships. Momo Hirai didn't do *her*.
+
+Or so Sana thought.
+
+It was 11:30 PM. The rest of the building had been empty for hours. Only the light from Momo’s large corner office was still on.
+
+Sana was sitting on the small sofa against the wall, going through tomorrow’s schedule, while Momo sat behind her massive mahogany desk, typing away furiously at her computer. The silence in the room was heavy, but comfortable. It was the only time Sana felt like she could breathe around Momo. When it was just them, away from the eyes of the world.
+
+Suddenly, Momo stopped typing. She leaned back in her chair, rubbing her temples with her fingers, looking exhausted. She let out a long, heavy sigh, the kind that carried years of pressure and loneliness.
+
+Sana couldn't help herself. She stood up, walked over to the desk, and placed a glass of warm water down gently.
+
+"You should rest, Momo," Sana said softly. She rarely used her first name, only when they were alone, only when she felt brave enough.
+
+Momo looked up, her dark eyes meeting Sana’s. For a long moment, she didn't say anything. She just looked, studying Sana’s face like she was trying to memorize every detail.
+
+"You always take care of me," Momo said quietly, her voice low and rough from exhaustion. "Even when I don't deserve it. Even when I treat you like nothing more than a piece of furniture."
+
+Sana smiled sadly. "You never treat me like furniture, Momo. You treat me like... the only person you trust."
+
+Momo stood up slowly, pushing her chair back. She walked around the desk, stopping right in front of Sana. She was close—too close. Close enough that Sana could smell her expensive perfume, close enough that she could feel the heat radiating from her body.
+
+"Why?" Momo asked, her eyes searching Sana’s. "Why do you stay? Why do you put up with me? Everyone else leaves. Everyone else is scared of me. But you... you’ve been here for two years. You never leave."
+
+Sana’s heart raced. This was it. This was the moment she should step back. This was the moment she should be professional. But she was tired of hiding. She was tired of being the secretary when she wanted to be so much more.
+
+"Because I see you," Sana whispered, her hand lifting slowly, hesitantly, until her fingers rested lightly against Momo’s cheek.
+
+Momo flinched slightly, but she didn't pull away. She leaned into the touch, her eyes closing, a look of pure relief washing over her face, like she had been waiting for this for years.
+
+"You see too much," Momo murmured, opening her eyes again, dark and vulnerable. "You see everything I try so hard to hide."
+
+"I see the woman who works herself to death because she thinks she has to be perfect," Sana said softly, her thumb stroking gently over Momo’s skin. "I see the woman who is lonely, who pushes everyone away because she’s scared of getting hurt. I see you, Momo. Not the cold boss everyone else sees. Just you."
+
+Momo let out a shaky breath. Her hands came up, hesitating in the air for a second before settling on Sana’s waist, gripping tightly, like she was afraid Sana would disappear if she let go.
+
+"I am cold," Momo admitted, her voice barely audible. "I am hard. I am difficult. I don't know how to be... soft. I don't know how to be what you deserve."
+
+Sana smiled, stepping closer, pressing her body against Momo’s. "Then let me teach you."
+
+Momo looked at her, surprised, her eyes wide. "Teach me?"
+
+"Teach you how to be soft," Sana whispered, leaning up until her lips were just inches from Momo’s. "Teach you how to be loved. Teach you that you don't have to be strong all the time."
+
+Momo’s resolve shattered completely. She pulled Sana flush against her, burying her face in the crook of Sana’s neck, breathing her in deeply.
+
+"I don't know how," Momo confessed, her voice trembling, the cold mask finally, finally cracking. "I don't know how to do this."
+
+Sana wrapped her arms tightly around Momo’s shoulders, holding her, comforting her, exactly as she had wanted to do for so long.
+
+"It's okay," Sana murmured, kissing the top of her head. "I'll lead. Just follow me."
+
+Momo pulled back just enough to look at Sana. Her eyes were wet, shining with unshed tears, but they were warm. They were alive. They were *hers*.
+
+"Okay," Momo whispered.
+
+She leaned down, finally, finally closing the distance between them, her lips meeting Sana’s—hesitant at first, unsure, but then hungry, desperate, pouring every bit of hidden feeling, every bit of loneliness, every bit of love she had buried deep inside into that one kiss.
+
+And in that office, late at night, the cold boss melted away, leaving behind only a woman who had finally found her warmth.
+`
+    },
+    4: { 
+        title: "BREED ME", 
+        content: `~Sana's Pov~
+
+I was sitting on the couch, legs crossed, watching her. My girlfriend, Myoui Mina. She was in the kitchen, wearing nothing but one of my oversized shirts, humming softly while making coffee. She looked so innocent. So sweet. So pure.
+
+But I knew exactly what she was. I knew exactly what she wanted. And God help me, I wanted it too.
+
+It had started a few weeks ago. Late one night, tangled in sheets, breathless and exhausted, she had whispered it in my ear. Soft, shy, like she was afraid to say it out loud.
+
+*"Sana... I want you to fill me up."*
+
+I had frozen then, looking down at her, her cheeks flushed red, eyes wide and wet.
+
+"What did you say, baby?" I asked, my voice hoarse.
+
+She had buried her face in my chest, embarrassed, but she repeated it, louder this time, bolder.
+
+"I want you to breed me, Sana. I want you to make me yours completely. I want to carry your baby."
+
+Ever since that night, everything had changed. Every look, every touch, every kiss was charged with that thought. It was all I could think about. It was all I could dream about. Seeing her round and full with my child. Seeing her body change, grow soft and heavy. Knowing I had put it there. Knowing she belonged to me in every single way possible.
+
+Mina walked back into the living room, holding two mugs, and stopped when she saw me looking at her. She bit her lip, a shy little smile on her face.
+
+"What?" she asked, blushing.
+
+I patted my lap. "Come here."
+
+She put the mugs down and walked over, straddling my hips easily, her legs wrapping around my waist. She rested her arms around my neck, looking down at me with those big, beautiful eyes.
+
+"You've been looking at me like that all week," she said softly, her fingers playing with the hair at the nape of my neck.
+
+"Like what?" I asked, my hands resting on her thighs, sliding up under the shirt, touching warm, bare skin.
+
+"Like you want to eat me," she whispered, leaning down to brush her lips against mine.
+
+"I do want to eat you," I growled, gripping her hips tighter, pulling her down to press firmly against me. "I want to do a lot more than that, Mina."
+
+She moaned softly, grinding her hips slowly against mine, her breath hitching. "I know. I want it too."
+
+"Tell me what you want, baby," I commanded, my hands sliding higher, pushing the shirt up until it was bunched around her waist, revealing her perfect, smooth skin. "Say it out loud."
+
+She buried her face in the crook of my neck, her voice muffled but clear.
+
+"I want you to make me a mother, Sana. I want you to cum inside me until I can't take it anymore. I want you to fill me up so deep it stays there. I want to be pregnant with your baby."
+
+I groaned, my grip on her tightening until my knuckles turned white. That was it. That was all I needed to hear.
+
+I stood up, holding her effortlessly, her legs wrapping tighter around me, her arms clinging to my neck. I carried her straight to the bedroom, kicking the door shut behind me. I laid her down on the bed, crawling over her, trapping her beneath me.
+
+She looked up at me, eyes wide and trusting, legs opening automatically for me, welcoming me in. She pulled the shirt over her head and threw it away, completely bare, completely exposed, completely mine.
+
+"You have no idea how long I've waited to hear you say that," I whispered, kissing my way down her body, from her lips, to her neck, to her chest, lavishing attention on every inch of her skin. "You have no idea how many nights I've laid awake imagining this. Imagining you round and swollen with my child."
+
+Mina arched off the bed, hands tangling in my hair, crying out my name. "Please, Sana. Don't make me wait anymore. Please."
+
+I moved between her legs, teasing her, touching her, tasting her until she was a trembling, begging mess beneath me. Until she was crying, pleading, pulling me up, desperate for me to be inside her.
+
+"Sana, please! I need you! I need you to fill me up! Breed me, Sana, please breed me!"
+
+I positioned myself at her entrance, looking down at her beautiful face, flushed and desperate.
+
+"Look at me," I ordered softly.
+
+She opened her eyes, locking onto mine.
+
+"Every drop," I promised, pushing into her slowly, deeply, watching her eyes roll back in pleasure. "Every single drop is going inside you. I'm going to give you exactly what you want, Mina. I'm going to make sure you get exactly what you asked for."
+
+I started moving, slow and deep, deliberate, focused entirely on her, on making this perfect, on claiming her completely. I watched her face, watched her expressions change, watched her body react to every thrust.
+
+"Say it again," I demanded, picking up the pace, driving deeper, harder.
+
+"Breed me!" she screamed, nails digging into my back, legs wrapping around me tight, pulling me as deep as I could go. "Fill me up! Make me yours! Get me pregnant, Sana! Please, please, please!"
+
+I lost myself in her. In the feeling of her tight, warm, wet around me. In the sound of my name falling from her lips over and over again. In the image of her growing round, carrying our family.
+
+I grabbed her hands, pinning them above her head, leaning down to kiss her hard and deep.
+
+"I'm going to fill you so full," I groaned, my rhythm becoming erratic, faster, harder, deeper. "I'm going to give you everything you want. You're going to be so beautiful, Mina. So perfect. All mine."
+
+She came apart beneath me, screaming my name, trembling uncontrollably, her body clamping down hard around me, milking me, pulling me over the edge with her.
+
+With a loud, guttural groan, I let go. I poured everything I had into her, deep, hot, endless, pumping into her over and over again, making sure nothing was wasted, making sure she was completely filled.
+
+I collapsed on top of her, breathless, exhausted, but completely satisfied. I stayed inside her, not moving, keeping us connected, keeping everything right where it belonged.
+
+Mina wrapped her arms around me, holding me close, kissing my shoulder, my neck, my cheek. She was smiling, glowing, happy in a way I had never seen before.
+
+"Thank you," she whispered.
+
+I lifted my head to look at her, brushing the hair back from her sweaty forehead.
+
+"Thank *you*," I said softly. "For wanting this. For wanting me."
+
+I kissed her gently, then rested my head on her chest, listening to the steady beat of her heart.
+
+"Now we wait," I murmured.
+
+She held me tighter, running her fingers through my hair.
+
+"Now we wait," she agreed, a smile in her voice. "And next time... we do it again."
+`
+    },
+    5: { 
+        title: "HALLOWEEN NIGHT", 
+        content: `~Third Person Pov~
+
+The music was loud, bass thumping through the floorboards, shaking the walls of the crowded apartment. It was Halloween night, and the place was packed with people in costumes, laughing, drinking, dancing, lost in the chaos of the party.
+
+Minatozaki Sana stood near the edge of the room, holding a red cup, sipping her drink slowly. She was dressed as an angel—white dress, white wings, a golden halo perched on her head. It was classic, it was pretty, and it was completely ironic.
+
+Because Sana knew exactly what she was. And she knew exactly what she wanted tonight.
+
+Her eyes scanned the room, looking for one person and one person only. She found her almost immediately, standing near the kitchen island, surrounded by a group of people, laughing brightly.
+
+Myoui Mina.
+
+She was dressed as a devil. Red leather outfit, tight and short, showing off every curve she had. Red horns, a red tail swaying behind her, and red lipstick painted perfectly on her lips. She looked incredible. She looked dangerous. She looked like everything Sana had been craving for months.
+
+Mina turned her head, as if she could feel Sana’s eyes on her. Their gazes locked across the crowded room. Mina smiled—a slow, wicked, knowing smile. She bit her lip, her eyes dropping down to look Sana up and down, before turning back to her friends, acting like she hadn't just set Sana’s entire body on fire with one look.
+
+Sana felt heat rush through her veins. She downed the rest of her drink and started walking toward the kitchen, pushing gently through the crowd, her eyes never leaving Mina.
+
+When she finally reached her, Mina excused herself from her friends and turned to face Sana, leaning casually against the counter, looking far too pleased with herself.
+
+"Looking for someone, Angel?" Mina asked, her voice low and smoky, dripping with amusement.
+
+Sana stepped closer, invading her personal space, ignoring the people around them. "You know exactly who I'm looking for, Devil."
+
+Mina laughed, the sound light and musical, but her eyes were dark and hungry. She reached out, her finger hooking into the neckline of Sana’s white dress, pulling her slightly closer.
+
+"Funny," Mina murmured, looking deep into Sana’s eyes. "I was just thinking about you. Wondering how long it would take you to come over here and make a move."
+
+Sana’s heart hammered against her ribs. "I’ve been making moves on you for three months, Mina. You just like to play hard to get."
+
+"Maybe I do," Mina teased, stepping back, turning around, walking slowly toward the hallway leading to the bedrooms, swaying her hips deliberately, looking back over her shoulder to make sure Sana was following. "Or maybe... I just like it when you chase me."
+
+Sana didn't hesitate. She followed immediately, leaving the noise and the crowd behind, stepping into the dark, quiet hallway.
+
+Mina was waiting for her at the end, leaning against a closed door. She pushed it open, stepped inside, and held it open, looking at Sana expectantly.
+
+"Are you brave enough to come in here with me?" Mina challenged, her eyes glinting in the dim light from the streetlamp outside.
+
+Sana walked straight into the room, and Mina closed the door behind them, locking it with a soft click that sounded incredibly loud in the sudden silence.
+
+They were alone. Finally.
+
+Sana turned around, and Mina was right there, pressed up against her, hands resting flat against Sana’s chest, pushing her back until she hit the wall.
+
+"Alone at last," Mina whispered, her hands sliding down, gripping Sana’s waist, pulling her close. "You have no idea how long I've been waiting for this."
+
+"You?" Sana breathed out, her hands resting on Mina’s hips, squeezing tight. "I’ve been waiting forever, Mina. Every time I see you, every time I talk to you... all I can think about is getting you alone."
+
+Mina smiled, rising on her tiptoes, her lips brushing against Sana’s ear, sending shivers racing down her spine.
+
+"Then don't wait anymore," she whispered.
+
+She pulled back just enough to look into Sana’s eyes, her expression shifting from playful to intense, dark and full of desire.
+
+"I'm not an angel, Sana," Mina murmured, her fingers tracing the line of Sana’s jaw. "And you’re definitely not a devil. But tonight... tonight we can be whatever we want."
+
+"I want you," Sana said simply, honestly, no games, no pretense. "That's all I want."
+
+Mina’s smile softened, became genuine, warm. She leaned in, her red lips pressing against Sana’s, soft and sweet at first, then deepening, becoming hungry, demanding, claiming.
+
+Sana melted against the wall, wrapping her arms around Mina’s waist, pulling her body flush against hers, feeling every curve, every line, every soft part of her. She tasted sweetness and heat and something uniquely Mina. She felt hands roaming over her body, touching, exploring, claiming.
+
+"Happy Halloween to me," Mina murmured against Sana’s lips, laughing softly as she guided her backward toward the bed.
+
+Costumes were discarded in a pile on the floor, forgotten. Wings, horns, halos, tails—none of it mattered anymore. It was just them. Two people who had been dancing around each other for months, finally giving in.
+
+The noise of the party downstairs was a distant hum, irrelevant. The only thing that existed was the feeling of skin against skin, the sound of breathless moans, the sight of the woman she had wanted for so long, completely hers.
+
+"Mine," Sana whispered, kissing her way down Mina’s neck, holding her tight.
+
+"Yours," Mina promised, arching into her touch, eyes fluttering shut in pleasure. "Completely, entirely, yours."
+
+Outside, the moon was full, ghosts and ghouls roamed the streets, and candy was handed out to children. But inside that dark room, hidden away from the world, the real magic of Halloween was happening—two souls finally finding their way to each other.
+`
+    },
+    6: { 
+        title: "JEALOUSY", 
+        content: `~Mina's Pov~
+
+I was sitting on the couch, arms crossed tightly over my chest, staring daggers across the room. My jaw was tight, my stomach was twisted into knots, and every single nerve ending in my body was screaming with irritation.
+
+And right in the middle of it all was her.
+
+Sana.
+
+She was standing near the kitchen counter, laughing. Not just a little laugh, but a big, bright, genuine laugh—the kind that made her eyes crinkle at the corners, the kind that made her whole face light up, the kind that usually made my heart skip a beat.
+
+But right now? Right now it just made me angry.
+
+Because she wasn't laughing at something I said. She was laughing at *her*—Hirai Momo.
+
+Momo was leaning against the counter, grinning that stupid, charming grin of hers, talking with her hands, telling some ridiculous story or joke or whatever it was that had Sana so amused. And Sana was eating it up. She was leaning in closer, touching Momo’s arm lightly, smiling up at her, looking at her with that exact same look she used to save only for me.
+
+I felt a surge of something hot and sharp and painful shoot through my chest. Jealousy. Pure, unadulterated, burning jealousy.
+
+I knew I was being irrational. I knew Momo was just a friend. I knew Sana loved me. I knew I had absolutely nothing to worry about.
+
+But knowing it didn't stop the feeling. It didn't stop the way my blood boiled every time Sana laughed at something Momo said. It didn't stop the way my stomach dropped every time Sana touched her arm or her shoulder or her hand. It didn't stop the way I wanted to march over there, grab Sana, and drag her away, just to prove to everyone—and especially to myself—that she belonged to me.
+
+I let out a loud, sharp huff of breath, sinking deeper into the couch, turning my head away, pretending to be incredibly interested in the pattern of the rug.
+
+I didn't have to look up to know Sana had noticed. I knew her better than I knew myself. I felt her eyes on me immediately. I heard her excuse herself from Momo, heard her footsteps coming toward me.
+
+"Mina?"
+
+Her voice. Soft, sweet, concerned.
+
+I didn't answer. I kept staring at the rug, my face set in a hard, stubborn frown.
+
+Sana stopped right in front of me, blocking my view. She crouched down so she was at eye level with me, her hands resting gently on my knees.
+
+"Baby?" she asked, her tone worried now. "What's wrong? You went from happy to... this... in about two seconds flat."
+
+I finally looked up, glaring at her, though I knew it probably looked more like a pout than anything else.
+
+"Nothing's wrong," I lied, bitterly.
+
+Sana raised an eyebrow, knowing me better than that. "Oh really? Because you look like you’re about to murder someone. And considering who you were looking at right before you got grumpy... I think I know exactly who it is."
+
+I looked away again, crossing my arms tighter. "I don't know what you're talking about."
+
+Sana sighed, shifting to sit next to me on the couch. She wrapped her arms around my waist, trying to pull me close, but I stiffened, refusing to lean into her like I usually did.
+
+"Are you jealous of Momo?" Sana asked softly, amusement and affection mixing in her voice.
+
+"I am not jealous!" I snapped, turning back to her, my face heating up. "Why would I be jealous? You can talk to whoever you want! Laugh with whoever you want! Touch whoever you want! It doesn't matter to me at all!"
+
+Sana bit her lip, trying not to laugh, which only made me angrier.
+
+"Oh, don't you dare laugh at me!" I cried out, pulling away from her grip completely, standing up and pacing around the small living room. "It's not funny! You were practically throwing yourself at her! Laughing, touching, smiling like she hung the moon and stars!"
+
+I stopped pacing, turning to face her, my chest heaving, eyes burning.
+
+"She's not even that funny!" I shouted, frustrated and hurt.
+
+Sana didn't say anything. She just stood up slowly, walking toward me, her expression soft and tender, no laughter, no teasing, just pure love.
+
+"Mina," she said gently, reaching out for me.
+
+I stepped back, shaking my head, tears pricking at my eyes. "You looked at her the way you look at me, Sana. You looked at her like she was everything."
+
+Sana stopped, her eyes widening slightly, understanding washing over her face. She closed the distance between us in two steps, grabbing my hands, holding them tight against her chest.
+
+"Oh, baby," she whispered, her voice thick with emotion. "No. No, never. I look at her like she’s a friend. Like she’s a funny, silly person I’ve known for years. But I don't look at her like *that*. I don't look at anyone like *that*."
+
+She lifted my hands, kissing my knuckles, one by one.
+
+"The way I look at you?" Sana said, staring deep into my eyes, intense and serious. "The way I look at you is something else entirely. The way I look at you is the way you look at the sun. The way you look at the most beautiful thing you’ve ever seen. The way you look at the only thing that matters."
+
+She pulled me closer, wrapping her arms around me tightly, holding me secure against her body.
+
+"I laugh at her jokes because she’s funny," Sana murmured, kissing my forehead, my eyelids, my nose, finally my lips. "But I laugh at *your* jokes because everything you say is funny to me. I listen to her stories because she’s interesting. But I listen to *your* stories because every word that comes out of your mouth is the most important sound in the world to me."
+
+She pulled back just enough to look me in the eye, her hands cupping my face gently.
+
+"And I touch her arm because it’s polite," Sana said softly, her thumb stroking my cheek. "But I touch you... I touch you because I can’t help myself. Because if I’m not touching you, I feel like I’m missing a part of myself. Because touching you is the only thing that makes me feel whole."
+
+Tears spilled over and ran down my cheeks, but this time they weren't tears of hurt or anger. They were tears of relief. Of love. Of knowing just how much I was loved in return.
+
+"I'm sorry," I whispered, burying my face in her chest, clinging to her shirt. "I know I'm being stupid. I know you love me. I just... I hate sharing you. I hate seeing you smile at anyone else like that. I want you all to myself."
+
+Sana chuckled softly, the sound vibrating through her chest and into mine. She kissed the top of my head, rocking me gently back and forth.
+
+"You don't have to share me, Mina," she promised, her voice firm and sure. "Not really. Everyone else gets a tiny, little piece of me. Just enough to be friendly. But you? You get everything. You get every part of me. You get my heart, my soul, my body, my mind. You get all of it. It’s yours. It’s always been yours."
+
+She pulled back, grinning that bright, beautiful smile that belonged only to me.
+
+"And for the record," Sana added, leaning down to whisper in my ear, sending heat rushing through my body. "You are the only one who makes me laugh until my stomach hurts. You are the only one who makes me crazy. You are the only one I want to drag into a bedroom and never let leave."
+
+I looked up at her, wiping my eyes, smiling shyly. "Really?"
+
+"Really," Sana confirmed, kissing me deeply, thoroughly, claiming me right there in the middle of the room, making sure everyone—including me—knew exactly who she belonged to. "Now... why don't we go somewhere private, and I can show you exactly who I belong to."
+
+She took my hand, lacing our fingers together, and led me away, not looking back, not caring about anyone else.
+
+And as I walked beside her, holding her hand, feeling her warmth, I knew. I knew I was the only one. I knew I was everything. And I knew I never had to be jealous again.
+`
+    }
+};
+
+// ✅ ADMIN PASSWORD
+const ADMIN_PASS = "admin123";
+
+// ✅ REMEMBER ME SYSTEM
+window.onload = function() {
+    let savedUser = localStorage.getItem("savedUser");
+    let savedPass = localStorage.getItem("savedPass");
+    if (savedUser && savedPass) {
+        document.getElementById("loginUser").value = savedUser;
+        document.getElementById("loginPass").value = savedPass;
+        login();
+    }
+};
+
+function showRegister() {
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("forgotPassBox").style.display = "none";
+    document.getElementById("registerBox").style.display = "block";
+}
+
+function showLogin() {
+    document.getElementById("registerBox").style.display = "none";
+    document.getElementById("forgotPassBox").style.display = "none";
+    document.getElementById("loginBox").style.display = "block";
+}
+
+function showForgotPass() {
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("registerBox").style.display = "none";
+    document.getElementById("forgotPassBox").style.display = "block";
+}
+
+function register() {
+    let user = document.getElementById("regUser").value.trim();
+    let pass = document.getElementById("regPass").value.trim();
+    if (!user || !pass) return alert("Fill all fields!");
+    if (localStorage.getItem("user_" + user)) return alert("Username already exists!");
+    
+    localStorage.setItem("user_" + user, pass);
+    alert("Registered successfully!");
+    showLogin();
+}
+
+function login() {
+    let user = document.getElementById("loginUser").value.trim();
+    let pass = document.getElementById("loginPass").value.trim();
+    let save = document.getElementById("saveAccount").checked;
+    
+    if (!user || !pass) return alert("Fill all fields!");
+    let storedPass = localStorage.getItem("user_" + user);
+    
+    if (storedPass && storedPass === pass) {
+        currentUser = user;
+        if (save) {
+            localStorage.setItem("savedUser", user);
+            localStorage.setItem("savedPass", pass);
+        } else {
+            localStorage.removeItem("savedUser");
+            localStorage.removeItem("savedPass");
+        }
+        enterApp();
+    } else {
+        alert("Invalid username or password!");
+    }
+}
+
+function resetAccount() {
+    let oldUser = document.getElementById("oldUser").value.trim();
+    let newUser = document.getElementById("newUser").value.trim();
+    let newPass = document.getElementById("newPass").value.trim();
+    
+    if (!oldUser || !newUser || !newPass) return alert("Fill all fields!");
+    if (!localStorage.getItem("user_" + oldUser)) return alert("Old username not found!");
+    
+    localStorage.removeItem("user_" + oldUser);
+    localStorage.setItem("user_" + newUser, newPass);
+    alert("Account updated! Please login.");
+    showLogin();
+}
+
+function enterApp() {
+    document.getElementById("authSection").style.display = "none";
+    document.getElementById("profileHeader").style.display = "flex";
+    document.getElementById("homeScreen").style.display = "flex";
+    document.getElementById("profileName").innerText = currentUser;
+    
+    if (currentUser === ADMIN_USERNAME) {
+        document.getElementById("profileIconDisplay").innerHTML = '<i class="fas fa-user-shield"></i>';
+    }
+}
+
+function logout() {
+    currentUser = null;
+    document.getElementById("authSection").style.display = "flex";
+    document.getElementById("profileHeader").style.display = "none";
+    document.getElementById("homeScreen").style.display = "none";
+    document.getElementById("mainContent").style.display = "none";
+    document.getElementById("profilePage").style.display = "none";
+}
+
+function toggleDropdown(e) {
+    e.stopPropagation();
+    let menu = document.getElementById("profileMenu");
+    menu.classList.toggle("show");
+}
+
+document.addEventListener('click', function() {
+    let menu = document.getElementById("profileMenu");
+    if (menu.classList.contains("show")) menu.classList.remove("show");
+});
+
+function openPage(id) {
+    document.getElementById(id).style.display = "block";
+    document.getElementById("profileMenu").classList.remove("show");
+}
+
+function closePage(id) {
+    document.getElementById(id).style.display = "none";
+}
+
+function previewCrop(input) {
+    if (input.files && input.files[0]) {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById("cropPreview").src = e.target.result;
+            document.getElementById("cropContainer").style.display = "block";
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function saveProfile() {
+    let newName = document.getElementById("editUsername").value.trim();
+    let previewSrc = document.getElementById("cropPreview").src;
+    
+    if (newName && newName !== currentUser) {
+        let oldPass = localStorage.getItem("user_" + currentUser);
+        localStorage.removeItem("user_" + currentUser);
+        localStorage.setItem("user_" + newName, oldPass);
+        currentUser = newName;
+        document.getElementById("profileName").innerText = currentUser;
+    }
+    
+    if (previewSrc && previewSrc.includes("data:image")) {
+        localStorage.setItem("profilePic_" + currentUser, previewSrc);
+        document.getElementById("profileIconDisplay").innerHTML = `<img src="${previewSrc}" alt="Profile">`;
+    }
+    
+    closePage('profilePage');
+}
+
+function openSet(num) {
+    document.getElementById("homeScreen").style.display = "none";
+    document.getElementById("mainContent").style.display = "block";
+    
+    // Hide all sets
+    for (let i = 1; i <= 11; i++) {
+        document.getElementById("set" + i).style.display = "none";
+    }
+    // Show selected set
+    document.getElementById("set" + num).style.display = "flex";
+}
+
+function backToMenu() {
+    document.getElementById("mainContent").style.display = "none";
+    document.getElementById("homeScreen").style.display = "flex";
+}
+
+function openStory(id) {
+    activeStoryId = id;
+    let story = stories[id];
+    
+    document.getElementById("storyModalTitle").innerText = story.title;
+    document.getElementById("storyText").innerHTML = `
+        <div class="view-icon">
+            <i class="fas fa-eye"></i>
+            <span id="viewCount">${getViews(id) + 1}</span>
+        </div>
+        <div style="margin-top: 20px; white-space: pre-wrap;">${story.content}</div>
+    `;
+    
+    // Increment view count
+    saveViews(id, getViews(id) + 1);
+    
+    // Load comments
+    loadComments(id);
+    
+    // Show admin panel
+    if (currentUser === ADMIN_USERNAME) {
+        document.getElementById("editTitle").value = story.title;
+        document.getElementById("editContent").value = story.content;
+        document.getElementById("adminPanel").classList.add("show");
+    } else {
+        document.getElementById("adminPanel").classList.remove("show");
+    }
+    
+    document.getElementById("storyModal").style.display = "block";
+    document.body.style.overflow = "hidden";
+}
+
+function closeStory() {
+    document.getElementById("storyModal").style.display = "none";
+    document.body.style.overflow = "auto";
+}
+
+function saveStory() {
+    let title = document.getElementById("editTitle").value.trim();
+    let content = document.getElementById("editContent").value.trim();
+    
+    if (!title || !content) return alert("Title and content cannot be empty!");
+    
+    stories[activeStoryId].title = title;
+    stories[activeStoryId].content = content;
+    
+    // Update displayed title
+    document.getElementById("title_" + activeStoryId).innerText = title;
+    
+    alert("Story saved!");
+    closeStory();
+}
+
+function getViews(id) {
+    return Number(localStorage.getItem("views_" + id)) || 0;
+}
+
+function saveViews(id, num) {
+    localStorage.setItem("views_" + id, num);
+}
+
+function addComment() {
+    let text = document.getElementById("commentText").value.trim();
+    if (!text) return;
+    
+    let comment = {
+        user: currentUser,
+        text: text,
+        time: new Date().toLocaleString()
+    };
+    
+    let key = "comments_" + activeStoryId;
+    let existing = JSON.parse(localStorage.getItem(key) || "[]");
+    existing.push(comment);
+    localStorage.setItem(key, JSON.stringify(existing));
+    
+    document.getElementById("commentText").value = "";
+    loadComments(activeStoryId);
+}
+
+function loadComments(id) {
+    let key = "comments_" + id;
+    let list = JSON.parse(localStorage.getItem(key) || "[]");
+    let html = "";
+    
+    list.forEach(c => {
+        html += `
+        <div class="comment-item">
+            <div class="comment-author">${c.user} • ${c.time}</div>
+            <div class="comment-text">${c.text}</div>
+        </div>
+        `;
+    });
+    
+    document.getElementById("commentList").innerHTML = html;
+}
+
+// ✅ CLOSE MODAL ON ESC KEY
+document.addEventListener('keydown', function(e) {
+    if (e.key === "Escape") closeStory();
+});
+
+</script>
+
+</body>
+</html>The file is too long. Dola only read the first 5%.
